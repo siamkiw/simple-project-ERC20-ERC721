@@ -1,5 +1,4 @@
 const {expect} = require("chai");
-const { isCallTrace } = require("hardhat/internal/hardhat-network/stack-traces/message-trace");
 
 describe("GLDToken contract", function(){
     let totalSupply = '10000000000000000000000'; // 10000 * 1e18

@@ -1,5 +1,6 @@
 const {expect} = require("chai")
 const { ethers } = require("hardhat")
+require('chai').use(require('chai-as-promised')).should()
 
 describe("ACToken contract", function(){
     let totalSupply = '10000000000000000000000'
@@ -78,9 +79,23 @@ describe("ACToken contract", function(){
             expect(minterBalance).to.equal(100)
         })
 
+        it("Should revert the transaction, called mint function by other role", async function(){
+            await ACToken.connect(foo).mint(foo.address, 100).should.be.rejected
+            await ACToken.connect(bar).mint(bar.address, 100).should.be.rejected
+            await ACToken.connect(zoo).mint(zoo.address, 100).should.be.rejected
+            await ACToken.connect(user).mint(user.address, 100).should.be.rejected
+        })
+
         it("Foo address should invoke foo funtion", async function(){
             const res = await ACToken.connect(foo).foo()
             expect(res).to.equal("You are FOO_ROLE")
+        })
+
+        it("Should revert the transaction, called foo function by other role", async function(){
+            await ACToken.connect(minter).foo().should.be.rejected
+            await ACToken.connect(bar).foo().should.be.rejected
+            await ACToken.connect(zoo).foo().should.be.rejected
+            await ACToken.connect(user).foo().should.be.rejected
         })
 
         it("Bar address should invoke bar funtion", async function(){
@@ -88,12 +103,26 @@ describe("ACToken contract", function(){
             expect(res).to.equal("You are BAR_ROLE")
         })
 
+        it("Should revert the transaction, called bar function by other role", async function(){
+            await ACToken.connect(minter).bar().should.be.rejected
+            await ACToken.connect(foo).bar().should.be.rejected
+            await ACToken.connect(zoo).bar().should.be.rejected
+            await ACToken.connect(user).bar().should.be.rejected
+        })
+
         it("Zoo address should invoke zoo funtion", async function(){
             const res = await ACToken.connect(zoo).zoo()
             expect(res).to.equal("You are ZOO_ROLE")
         })
 
-        it("Any address should invoke anyoneCanCall funtion", async function(){
+        it("Should revert the transaction, called zoo function by other role", async function(){
+            await ACToken.connect(minter).zoo().should.be.rejected
+            await ACToken.connect(foo).zoo().should.be.rejected
+            await ACToken.connect(bar).zoo().should.be.rejected
+            await ACToken.connect(user).zoo().should.be.rejected
+        })
+
+        it("Every role should invoke anyoneCanCall funtion", async function(){
             const expectAws = 'Anyone can call this function.'
             let res = await ACToken.anyoneCanCall()
             expect(res).to.equal(expectAws)

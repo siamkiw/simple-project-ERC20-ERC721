@@ -141,4 +141,18 @@ describe("ACToken contract", function(){
         })
     })
 
+    describe("Transaction", function(){
+        it("Should transfer tokens between accounts", async function(){
+
+            // Transfer 50 tokens from admin to user    
+            await ACToken.transfer(user.address, 50);
+            const userBalance = await ACToken.balanceOf(user.address);
+            expect(userBalance).to.equal(50);
+
+            // We use .connect(signer) to send a transaction from another account
+            await ACToken.connect(user).transfer(foo.address, 50);
+            const fooBalance = await ACToken.balanceOf(foo.address);
+            expect(fooBalance).to.equal(50);
+        })
+    })
 })

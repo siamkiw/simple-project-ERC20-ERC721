@@ -3,9 +3,11 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+// import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "hardhat/console.sol";
 
-contract AccessControlToken is ERC20, AccessControl {
+contract AccessControlToken is ERC20, AccessControlEnumerable {
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant FOO_ROLE = keccak256("FOO_ROLE");
@@ -23,8 +25,8 @@ contract AccessControlToken is ERC20, AccessControl {
         _setRoleAdmin(ZOO_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
-    function mint(uint256 amount) public onlyRole(MINTER_ROLE) {
-        _mint(msg.sender, amount);
+    function mint(address toAddress, uint256 amount) public onlyRole(MINTER_ROLE) {
+        _mint(toAddress, amount);
     }
 
     function foo() public view onlyRole(FOO_ROLE) returns (string memory){
@@ -37,7 +39,7 @@ contract AccessControlToken is ERC20, AccessControl {
 
     function zoo() public view  returns (string memory){
         require(hasRole(ZOO_ROLE, msg.sender), "You are not ZOO_ROLE.");
-        return "You are BAR_ROLE";
+        return "You are ZOO_ROLE";
     }
 
     function anyoneCanCall() public pure returns (string memory){

@@ -154,5 +154,20 @@ describe("ACToken contract", function(){
             const fooBalance = await ACToken.balanceOf(foo.address);
             expect(fooBalance).to.equal(50);
         })
+
+        it("Should fail if sender doesn’t have enough tokens", async function(){
+            const initialAdminBalance = await ACToken.balanceOf(admin.address);
+
+            // Try to send 1 token from addr1 (0 tokens) to owner (1000000 tokens).
+            // `require` will evaluate false and revert the transaction.
+            await expect(
+                ACToken.connect(user).transfer(admin.address, 1)
+              ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
+
+            // Owner balance shouldn't have changed.
+            expect(await ACToken.balanceOf(admin.address)).to.equal(
+                initialAdminBalance
+            )
+        })
     })
 })
